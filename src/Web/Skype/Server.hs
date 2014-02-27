@@ -76,7 +76,6 @@ fetchChat chatID = ChatEntity chatID
                <*> Chat.getStatus chatID
                <*> Chat.getTopic chatID
                <*> Chat.getWindowTitle chatID
-               <*> Chat.isBookmarked chatID
 
 fetchChatMessage :: (MonadBaseControl IO m, MonadIO m, MonadSkype m)
                  => ChatMessageID
@@ -89,5 +88,4 @@ fetchChatMessage chatMessageID = ChatMessageEntity chatMessageID
                              <*> ChatMessage.getStatus chatMessageID
                              <*> ChatMessage.getLeaveReason chatMessageID
                              <*> ChatMessage.getChat chatMessageID
-                             <*> ChatMessage.isEditable chatMessageID
                              <*> ChatMessage.getBody chatMessageID

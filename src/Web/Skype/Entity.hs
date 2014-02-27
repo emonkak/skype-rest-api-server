@@ -37,7 +37,6 @@ data ChatEntity = ChatEntity
   , _chatStatus :: ChatStatus
   , _chatTopic :: ChatTopic
   , _chatWindowTitle :: ChatWindowTitle
-  , _chatIsBookmarked :: Bool
   }
   deriving (Show, Typeable)
 
@@ -52,7 +51,6 @@ instance ToJSON ChatEntity where
     , "status"        .= _chatStatus chat
     , "topic"         .= _chatTopic chat
     , "window_title"  .= _chatWindowTitle chat
-    , "is_bookmarked" .= _chatIsBookmarked chat
     ]
 
 instance FromRow ChatEntity where
@@ -62,7 +60,6 @@ instance FromRow ChatEntity where
                        <*> field  -- status
                        <*> field  -- topic
                        <*> field  -- window_title
-                       <*> field  -- is_bookmarked
 
 instance ToString ChatStatus where
   toString ChatStatusLegacyDialog    = "legacy_dialog"
@@ -90,7 +87,6 @@ data ChatMessageEntity = ChatMessageEntity
   , _chatMessageStatus :: ChatMessageStatus
   , _chatMessageLeaveReason :: Maybe ChatMessageLeaveReason
   , _chatMessageChat :: ChatID
-  , _chatMessageIsEditable :: Bool
   , _chatMessageBody :: ChatMessageBody
   }
   deriving (Show, Typeable)
@@ -108,7 +104,6 @@ instance ToJSON ChatMessageEntity where
     , "status"              .= _chatMessageStatus chatMessage
     , "leave_reason"        .= _chatMessageLeaveReason chatMessage
     , "chat"                .= _chatMessageChat chatMessage
-    , "is_editable"         .= _chatMessageIsEditable chatMessage
     , "body"                .= _chatMessageBody chatMessage
     ]
 
@@ -121,7 +116,6 @@ instance FromRow ChatMessageEntity where
                               <*> field  -- status
                               <*> field  -- leave_reason
                               <*> field  -- chat
-                              <*> field  -- is_editable
                               <*> field  -- body
 
 instance ToString ChatMessageType where

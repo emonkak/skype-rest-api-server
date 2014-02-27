@@ -38,7 +38,6 @@ initDatabase = withDatabase $ mapM_ execute_
       , ", status TEXT NOT NULL"
       , ", leave_reason TEXT"
       , ", chat TEXT NOT NULL"
-      , ", is_editable INTEGER NOT NULL"
       , ", body TEXT NOT NULL"
       , ")"
       ]
@@ -71,7 +70,6 @@ storeChatMessage chatMessage = do
     , _chatMessageStatus chatMessage
     , _chatMessageLeaveReason chatMessage
     , _chatMessageChat chatMessage
-    , _chatMessageIsEditable chatMessage
     , _chatMessageBody chatMessage
     )
   execute sql_insertIntoChatMessagesFTS
@@ -89,9 +87,8 @@ storeChatMessage chatMessage = do
       , ", status"
       , ", leave_reason"
       , ", chat"
-      , ", is_editable"
       , ", body"
-      , ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+      , ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
       ]
 
     sql_insertIntoChatMessagesFTS = mconcat
