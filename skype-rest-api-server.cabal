@@ -17,13 +17,14 @@ cabal-version:       >=1.10
 
 executable skype-rest-api-server
   main-is: Main.hs
-  other-modules:       Web.Skype.Server,
-                       Web.Skype.Server.Receiver
+  other-modules:       Web.Skype.Entity,
+                       Web.Skype.Server
   -- other-extensions:
   build-depends:       aeson >=0.6,
                        base >=4.6 && <4.7,
                        bytestring >=0.10.2,
                        lifted-base >=0.2,
+                       monad-control >=0.3,
                        mtl >=2.0,
                        scotty >=0.6,
                        skype4hs,

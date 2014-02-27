@@ -7,8 +7,7 @@ import Control.Monad (forever)
 import Control.Monad.STM (atomically)
 import Control.Monad.Trans (liftIO)
 import Web.Skype.Server
-import Web.Skype.Server.Database
-import Web.Skype.Server.Receiver
+import Web.Skype.Database
 
 import qualified Web.Skype.API as Skype
 import qualified Web.Skype.Command.Misc as Skype
@@ -29,6 +28,6 @@ main = do
     fork $ forever $ do
       notification <- liftIO $ atomically $ readTChan notificationChan
 
-      maybe (return ()) (liftIO . receiver) $ Skype.parseNotification notification
+      liftIO $ print $ Skype.parseNotification notification
 
   server 3000 connection
