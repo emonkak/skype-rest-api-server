@@ -199,3 +199,102 @@ instance ToJSON SkypeError where
     , "error_command"     .= command
     , "error_description" .= description
     ]
+
+-- * User
+
+data UserEntity = UserEntity
+  { _userID :: UserID
+  , _userFullName :: UserFullName
+  , _userBirthday :: Maybe UserBirthday
+  , _userSex :: UserSex
+  , _userLanguage :: Maybe (UserLanguageISOCode, UserLanguage)
+  , _userCountry :: Maybe (UserCountryISOCode, UserCountry)
+  , _userProvince :: UserProvince
+  , _userCity :: UserCity
+  , _userHomePhone :: UserPhone
+  , _userOfficePhone :: UserPhone
+  , _userMobilePhone :: UserPhone
+  , _userHomepage :: UserHomepage
+  , _userAbout :: UserAbout
+  , _userIsVideoCapable :: Bool
+  , _userIsVoicemailCapable :: Bool
+  , _userBuddyStatus :: UserBuddyStatus
+  , _userIsAuthorized :: Bool
+  , _userIsBlocked :: Bool
+  , _userOnlineStatus :: UserOnlineStatus
+  , _userLastOnlineTimestamp :: Timestamp
+  , _userCanLeaveVoicemail :: Bool
+  , _userSpeedDial :: UserSpeedDial
+  , _userMoodText :: UserMoodText
+  , _userTimezone :: UserTimezoneOffset
+  , _userIsCallForwardingActive :: Bool
+  , _userNumberOfAuthedBuddies :: Int
+  , _userDisplayName :: UserDisplayName
+  }
+  deriving (Show, Typeable)
+
+instance Eq UserEntity where
+  (==) x y = _userID x == _userID y
+
+instance ToJSON UserEntity where
+  toJSON user = object
+    [ "user_id"                   .= _userID user
+    , "full_name"                 .= _userFullName user
+    , "birthday"                  .= (show <$> _userBirthday user)
+    , "sex"                       .= _userSex user
+    , "language"                  .= (snd <$> _userLanguage user)
+    , "language_iso_code"         .= (fst <$> _userLanguage user)
+    , "country"                   .= (snd <$> _userCountry user)
+    , "country_iso_code"          .= (fst <$> _userCountry user)
+    , "province"                  .= _userProvince user
+    , "city"                      .= _userCity user
+    , "home_phone"                .= _userHomePhone user
+    , "office_phone"              .= _userOfficePhone user
+    , "mobile_phone"              .= _userMobilePhone user
+    , "homepage"                  .= _userHomepage user
+    , "about"                     .= _userAbout user
+    , "is_video_capable"          .= _userIsVideoCapable user
+    , "is_voice_mail_capable"     .= _userIsVoicemailCapable user
+    , "buddy_status"              .= _userBuddyStatus user
+    , "is_authorized"             .= _userIsAuthorized user
+    , "is_blocked"                .= _userIsBlocked user
+    , "online_status"             .= _userOnlineStatus user
+    , "last_online_timestamp"     .= _userLastOnlineTimestamp user
+    , "can_leave_voicemail"       .= _userCanLeaveVoicemail user
+    , "speed_dial"                .= _userSpeedDial user
+    , "mood_text"                 .= _userMoodText user
+    , "timezone"                  .= _userTimezone user
+    , "is_call_forwarding_active" .= _userIsCallForwardingActive user
+    , "number_of_authed_buddies"  .= _userNumberOfAuthedBuddies user
+    , "display_name"              .= _userDisplayName user
+    ]
+
+instance ToString UserSex where
+  toString UserSexUnknown = "unknown"
+  toString UserSexMale    = "male"
+  toString UserSexFemale  = "female"
+
+instance ToString UserStatus where
+  toString UserStatusUnknown      = "unknown"
+  toString UserStatusOnline       = "online"
+  toString UserStatusOffline      = "offline"
+  toString UserStatusSkypeMe      = "skype_me"
+  toString UserStatusAway         = "away"
+  toString UserStatusNotAvailable = "not_available"
+  toString UserStatusDoNotDisturb = "do_not_disturb"
+  toString UserStatusInvisible    = "invisible"
+  toString UserStatusLoggedOut    = "logged_out"
+
+instance ToString UserBuddyStatus where
+  toString UserBuddyStatusNeverBeen = "never_been"
+  toString UserBuddyStatusDeleted   = "deleted"
+  toString UserBuddyStatusPending   = "pending"
+  toString UserBuddyStatusAdded     = "added"
+
+instance ToString UserOnlineStatus where
+  toString UserOnlineStatusUnknown      = "unknown"
+  toString UserOnlineStatusOffline      = "offline"
+  toString UserOnlineStatusOnline       = "online"
+  toString UserOnlineStatusAway         = "away"
+  toString UserOnlineStatusNotAvailable = "not_available"
+  toString UserOnlineStatusDoNotDisturb = "do_not_disturb"
