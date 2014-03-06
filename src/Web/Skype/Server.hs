@@ -34,8 +34,17 @@ defaultPerPage = 30
 getAllChats :: Skype.Connection -> ActionM ()
 getAllChats connection = do
   response <- liftIO $ runSkype connection $
-              Chat.searchAllChats >>= mapM fetchChat
+              Chat.searchAllChats >>= mapM pullChat
   either json json response
+  where
+    pullChat chatID = do
+      maybeChat <- liftIO $ withDatabase $ findChat chatID
+      case maybeChat of
+        Just chat -> return chat
+        Nothing -> do
+          chat <- fetchChat chatID
+          liftIO $ withDatabase $ storeChat chat
+          return chat
 
 getChat :: Skype.Connection -> ActionM ()
 getChat connection = do
@@ -45,21 +54,21 @@ getChat connection = do
 
 getAllChatMessages :: Skype.Connection -> ActionM ()
 getAllChatMessages connection = do
-  chatMessageID <- param "1"
+  chatID <- param "1"
   perPage <- param "per_page" `orElse` defaultPerPage
   page <- param "page" `orElse` 0
   response <- liftIO $ runSkype connection $ do
-    messageIDs <- Chat.getAllMessages chatMessageID
-    mapM getChatMessage $ take perPage $ drop (page * perPage) messageIDs
+    messageIDs <- Chat.getAllMessages chatID
+    mapM pullChatMessage $ take perPage $ drop (page * perPage) messageIDs
   either json json response
   where
     orElse q def = rescue q $ \_ -> return def
 
-    getChatMessage chatMessageID = do
+    pullChatMessage chatMessageID = do
       maybeChatMessage <- liftIO $ withDatabase $ findChatMessge chatMessageID
       case maybeChatMessage of
         Just chatMessage -> return chatMessage
-        Nothing          -> do
+        Nothing -> do
           chatMessage <- fetchChatMessage chatMessageID
           liftIO $ withDatabase $ storeChatMessage chatMessage
           return chatMessage

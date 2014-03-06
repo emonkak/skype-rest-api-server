@@ -3,9 +3,10 @@
 module Web.Skype.Database (
   initDatabase,
   withDatabase,
-
+  findChat,
   findChatMessge,
   searchChatMessage,
+  storeChat,
   storeChatMessage
 ) where
 
@@ -24,10 +25,22 @@ type ConnectionT m a = ReaderT SQLite.Connection m a
 
 initDatabase :: IO ()
 initDatabase = withDatabase $ mapM_ execute_
-  [ sql_createChatMessagesTable
+  [ sql_createChatTable
+  , sql_createChatMessagesTable
   , sql_createChatMessagesFTSTable
   ]
   where
+    sql_createChatTable = mconcat
+      [ "CREATE TABLE IF NOT EXISTS chats"
+      , "( chat_id TEXT PRIMARY KEY"
+      , ", timestamp INTEGER NOT NULL"
+      , ", adder TEXT DEFAULT NULL"
+      , ", status TEXT NOT NULL"
+      , ", topic TEXT NOT NULL"
+      , ", window_title TEXT NOT NULL"
+      , ")"
+      ]
+
     sql_createChatMessagesTable = mconcat
       [ "CREATE TABLE IF NOT EXISTS chat_messages"
       , "( chat_message_id INTEGER PRIMARY KEY"
@@ -49,6 +62,11 @@ initDatabase = withDatabase $ mapM_ execute_
       , ")"
       ]
 
+findChat :: ChatID -> ConnectionT IO (Maybe ChatEntity)
+findChat = ((<$>) listToMaybe) . query sql . SQLite.Only
+  where
+    sql = "SELECT * FROM chats WHERE chat_id = ?"
+
 findChatMessge :: ChatMessageID -> ConnectionT IO (Maybe ChatMessageEntity)
 findChatMessge = ((<$>) listToMaybe) . query sql . SQLite.Only
   where
@@ -58,6 +76,28 @@ searchChatMessage :: T.Text -> ConnectionT IO [ChatMessageEntity]
 searchChatMessage = query sql . SQLite.Only
   where
     sql = "SELECT chat_messages.* FROM chat_messages_fts JOIN chat_messages USING (chat_message_id) WHERE tokens MATCH ?"
+
+storeChat :: ChatEntity -> ConnectionT IO ()
+storeChat chat = do
+  execute sql_insertIntoChat
+    ( _chatID chat
+    , _chatTimestamp chat
+    , _chatAdder chat
+    , _chatStatus chat
+    , _chatTopic chat
+    , _chatWindowTitle chat
+    )
+  where
+    sql_insertIntoChat = mconcat
+      [ "INSERT OR REPLACE INTO chats"
+      , "( chat_id"
+      , ", timestamp"
+      , ", adder"
+      , ", status"
+      , ", topic"
+      , ", window_title"
+      , ") VALUES (?, ?, ?, ?, ?, ?)"
+      ]
 
 storeChatMessage :: ChatMessageEntity -> ConnectionT IO ()
 storeChatMessage chatMessage = do
@@ -78,7 +118,7 @@ storeChatMessage chatMessage = do
     )
   where
     sql_insertIntoChatMessages = mconcat
-      [ "INSERT OR IGNORE INTO chat_messages"
+      [ "INSERT OR REPLACE INTO chat_messages"
       , "( chat_message_id"
       , ", timestamp"
       , ", sender"
@@ -92,7 +132,7 @@ storeChatMessage chatMessage = do
       ]
 
     sql_insertIntoChatMessagesFTS = mconcat
-      [ "INSERT OR IGNORE INTO chat_messages_fts"
+      [ "INSERT OR REPLACE INTO chat_messages_fts"
       , "( chat_message_id"
       , ", tokens"
       , ") VALUES (?, ?)"
