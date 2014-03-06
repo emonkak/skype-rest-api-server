@@ -22,11 +22,14 @@ server :: Int -> Skype.Connection -> IO ()
 server port connection = scotty port $ do
   get  "/chat/"                       $ getAllChats connection
   get  "/chat/search"                 $ getSearchChatMessage
-  get  "/user/"                       $ getAllUser connection
-  get  "/user/:user_id"              $ getUser connection
+  get  "/user/"                       $ getAllUsers connection
+  get  "/user/:user_id"               $ getUser connection
   get  (regex "^/chat/(#.*)")         $ getChat connection
   post (regex "^/chat/(#.*)")         $ postChat connection
   get  (regex "^/chat/message/(#.*)") $ getAllChatMessages connection
+
+defaultPerPage :: Int
+defaultPerPage = 30
 
 getAllChats :: Skype.Connection -> ActionM ()
 getAllChats connection = do
@@ -43,10 +46,15 @@ getChat connection = do
 getAllChatMessages :: Skype.Connection -> ActionM ()
 getAllChatMessages connection = do
   chatMessageID <- param "1"
-  response <- liftIO $ runSkype connection $
-    Chat.getAllMessages chatMessageID >>= mapM getChatMessage
+  perPage <- param "per_page" `orElse` defaultPerPage
+  page <- param "page" `orElse` 0
+  response <- liftIO $ runSkype connection $ do
+    messageIDs <- Chat.getAllMessages chatMessageID
+    mapM getChatMessage $ take perPage $ drop (page * perPage) messageIDs
   either json json response
   where
+    orElse q def = rescue q $ \_ -> return def
+
     getChatMessage chatMessageID = do
       maybeChatMessage <- liftIO $ withDatabase $ findChatMessge chatMessageID
       case maybeChatMessage of
@@ -76,8 +84,8 @@ getUser connection = do
   response <- liftIO $ runSkype connection $ fetchUser userID
   either json json response
 
-getAllUser :: Skype.Connection -> ActionM ()
-getAllUser connection = do
+getAllUsers :: Skype.Connection -> ActionM ()
+getAllUsers connection = do
   response <- liftIO $ runSkype connection $ User.searchAllFriends >>= mapM fetchUser
   either json json response
 
