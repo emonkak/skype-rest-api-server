@@ -73,7 +73,7 @@ findChatMessge = ((<$>) listToMaybe) . query sql . SQLite.Only
     sql = "SELECT * FROM chat_messages WHERE chat_message_id = ?"
 
 searchChatMessage :: T.Text -> ConnectionT IO [ChatMessageEntity]
-searchChatMessage = query sql . SQLite.Only
+searchChatMessage = query sql . SQLite.Only . T.intercalate " " . bigram
   where
     sql = "SELECT chat_messages.* FROM chat_messages_fts JOIN chat_messages USING (chat_message_id) WHERE tokens MATCH ?"
 

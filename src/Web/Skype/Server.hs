@@ -10,9 +10,7 @@ import Web.Skype.Core
 import Web.Skype.Database
 import Web.Skype.Entity
 import Web.Skype.Protocol
-import Web.Skype.Tokenizer
 
-import qualified Data.Text as T
 import qualified Web.Skype.API as Skype
 import qualified Web.Skype.Command.Chat as Chat
 import qualified Web.Skype.Command.ChatMessage as ChatMessage
@@ -76,8 +74,7 @@ getAllChatMessages connection = do
 getSearchChatMessage :: ActionM ()
 getSearchChatMessage = do
   query <- param "q"
-  response <- liftIO $ withDatabase $ searchChatMessage $
-              T.intercalate " " $ unigram query
+  response <- liftIO $ withDatabase $ searchChatMessage query
   json response
 
 postChat :: Skype.Connection -> ActionM ()
