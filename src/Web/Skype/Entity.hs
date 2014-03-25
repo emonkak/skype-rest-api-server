@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveDataTypeable,
              FlexibleInstances,
+             GeneralizedNewtypeDeriving,
              OverlappingInstances,
              UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -31,6 +32,9 @@ instance (ToString a) => ToField a where
 
 -- * Chat
 
+newtype ChatIDWrapper = ChatIDWrapper { unChatID :: ChatID }
+  deriving (Eq, Show)
+
 data ChatEntity = ChatEntity
   { _chatID :: ChatID
   , _chatTimestamp :: Timestamp
@@ -44,11 +48,14 @@ data ChatEntity = ChatEntity
 instance Eq ChatEntity where
   (==) x y = _chatID x == _chatID y
 
+instance ToJSON ChatIDWrapper where
+  toJSON = toJSON . T.decodeLatin1 . unChatID
+
 instance ToJSON ChatEntity where
   toJSON chat = object
-    [ "chat_id"       .= T.decodeLatin1 (_chatID chat)
+    [ "chat_id"       .= (ChatIDWrapper $ _chatID chat)
     , "timestamp"     .= _chatTimestamp chat
-    , "adder"         .= (T.decodeLatin1 <$> _chatAdder chat)
+    , "adder"         .= (UserIDWrapper <$> _chatAdder chat)
     , "status"        .= _chatStatus chat
     , "topic"         .= _chatTopic chat
     , "window_title"  .= _chatWindowTitle chat
@@ -99,12 +106,12 @@ instance ToJSON ChatMessageEntity where
   toJSON chatMessage = object
     [ "chat_message_id"     .= _chatMessageID chatMessage
     , "timestamp"           .= _chatMessageTimestamp chatMessage
-    , "sender"              .= T.decodeLatin1 (_chatMessageSender chatMessage)
+    , "sender"              .= _chatMessageSender chatMessage
     , "sender_display_name" .= _chatMessageSenderDisplayName chatMessage
     , "type"                .= _chatMessageType chatMessage
     , "status"              .= _chatMessageStatus chatMessage
     , "leave_reason"        .= _chatMessageLeaveReason chatMessage
-    , "chat"                .= T.decodeLatin1 (_chatMessageChat chatMessage)
+    , "chat"                .= (ChatIDWrapper $ _chatMessageChat chatMessage)
     , "body"                .= _chatMessageBody chatMessage
     ]
 
@@ -202,6 +209,9 @@ instance ToJSON SkypeError where
     ]
 
 -- * User
+--
+newtype UserIDWrapper = UserIDWrapper { unUserID :: UserID }
+  deriving (Eq, Show)
 
 data UserEntity = UserEntity
   { _userID :: UserID
@@ -237,9 +247,12 @@ data UserEntity = UserEntity
 instance Eq UserEntity where
   (==) x y = _userID x == _userID y
 
+instance ToJSON UserIDWrapper where
+  toJSON = toJSON . T.decodeLatin1 . unUserID
+
 instance ToJSON UserEntity where
   toJSON user = object
-    [ "user_id"                   .= T.decodeLatin1 (_userID user)
+    [ "user_id"                   .= (UserIDWrapper $ _userID user)
     , "full_name"                 .= _userFullName user
     , "birthday"                  .= (show <$> _userBirthday user)
     , "sex"                       .= _userSex user
