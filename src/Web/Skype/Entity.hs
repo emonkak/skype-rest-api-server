@@ -18,6 +18,7 @@ import Web.Skype.Core
 import Web.Skype.Protocol
 
 import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
 
 class ToString a where
   toString :: a -> String
@@ -45,9 +46,9 @@ instance Eq ChatEntity where
 
 instance ToJSON ChatEntity where
   toJSON chat = object
-    [ "chat_id"       .= _chatID chat
+    [ "chat_id"       .= T.decodeLatin1 (_chatID chat)
     , "timestamp"     .= _chatTimestamp chat
-    , "adder"         .= _chatAdder chat
+    , "adder"         .= (T.decodeLatin1 <$> _chatAdder chat)
     , "status"        .= _chatStatus chat
     , "topic"         .= _chatTopic chat
     , "window_title"  .= _chatWindowTitle chat
@@ -98,12 +99,12 @@ instance ToJSON ChatMessageEntity where
   toJSON chatMessage = object
     [ "chat_message_id"     .= _chatMessageID chatMessage
     , "timestamp"           .= _chatMessageTimestamp chatMessage
-    , "sender"              .= _chatMessageSender chatMessage
+    , "sender"              .= T.decodeLatin1 (_chatMessageSender chatMessage)
     , "sender_display_name" .= _chatMessageSenderDisplayName chatMessage
     , "type"                .= _chatMessageType chatMessage
     , "status"              .= _chatMessageStatus chatMessage
     , "leave_reason"        .= _chatMessageLeaveReason chatMessage
-    , "chat"                .= _chatMessageChat chatMessage
+    , "chat"                .= T.decodeLatin1 (_chatMessageChat chatMessage)
     , "body"                .= _chatMessageBody chatMessage
     ]
 
@@ -196,7 +197,7 @@ instance FromField ChatMessageLeaveReason where
 instance ToJSON SkypeError where
   toJSON (SkypeError code command description) = object
     [ "error_code"        .= code
-    , "error_command"     .= command
+    , "error_command"     .= T.decodeLatin1 command
     , "error_description" .= description
     ]
 
@@ -238,7 +239,7 @@ instance Eq UserEntity where
 
 instance ToJSON UserEntity where
   toJSON user = object
-    [ "user_id"                   .= _userID user
+    [ "user_id"                   .= T.decodeLatin1 (_userID user)
     , "full_name"                 .= _userFullName user
     , "birthday"                  .= (show <$> _userBirthday user)
     , "sex"                       .= _userSex user
