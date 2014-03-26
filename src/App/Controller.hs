@@ -1,26 +1,24 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances #-}
 
-module Web.Skype.Server (server) where
+module App.Controller (
+  getAllChats,
+  getChat,
+  getAllChatMessages,
+  getSearchChatMessage,
+  postChat,
+  getUser,
+  getAllUsers
+) where
 
+import App.Database
+import App.Fetcher
 import Control.Monad.Trans (MonadIO, liftIO)
 import Web.Scotty
 import Web.Skype.Core
-import Web.Skype.Database
-import Web.Skype.Fetcher
 
 import qualified Web.Skype.API as Skype
 import qualified Web.Skype.Command.Chat as Chat
 import qualified Web.Skype.Command.User as User
-
-server :: Int -> Skype.Connection -> IO ()
-server port connection = scotty port $ do
-  get  "/chat/"                       $ getAllChats connection
-  get  "/chat/search"                 $ getSearchChatMessage
-  get  "/user/"                       $ getAllUsers connection
-  get  "/user/:user_id"               $ getUser connection
-  get  (regex "^/chat/(#.*)")         $ getChat connection
-  post (regex "^/chat/(#.*)")         $ postChat connection
-  get  (regex "^/chat/message/(#.*)") $ getAllChatMessages connection
 
 defaultPerPage :: Int
 defaultPerPage = 30

@@ -1,4 +1,4 @@
-module Web.Skype.Tokenizer where
+module App.Tokenizer where
 
 import Data.Char (isSpace)
 

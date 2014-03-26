@@ -5,7 +5,7 @@
              UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module Web.Skype.Entity where
+module App.Entity where
 
 import Control.Applicative
 import Data.Aeson (ToJSON(..), (.=), object)

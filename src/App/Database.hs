@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Web.Skype.Database (
+module App.Database (
   initDatabase,
   withDatabase,
   findChat,
@@ -10,13 +10,15 @@ module Web.Skype.Database (
   storeChatMessage
 ) where
 
+import App.Entity
+import App.Tokenizer
 import Control.Applicative
 import Control.Monad.Reader
 import Data.Maybe (listToMaybe)
 import Data.Monoid
-import Web.Skype.Entity
+import System.Directory (getHomeDirectory)
+import System.FilePath ((</>))
 import Web.Skype.Protocol
-import Web.Skype.Tokenizer
 
 import qualified Data.Text as T
 import qualified Database.SQLite.Simple as SQLite
@@ -141,7 +143,9 @@ storeChatMessage chatMessage = do
 -- * Utilities
 
 withDatabase :: ConnectionT IO a -> IO a
-withDatabase = SQLite.withConnection "skype.db" . runReaderT
+withDatabase action = do
+  homeDirectory <- getHomeDirectory
+  SQLite.withConnection (homeDirectory </> ".skype.db") (runReaderT action)
 
 execute :: (SQLite.ToRow q) => SQLite.Query -> q -> ConnectionT IO ()
 execute template qs = do

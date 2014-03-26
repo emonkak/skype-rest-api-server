@@ -1,12 +1,12 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Web.Skype.Fetcher where
+module App.Fetcher where
 
+import App.Entity
 import Control.Applicative
 import Control.Monad.Trans (MonadIO)
-import Control.Monad.Trans.Control
+import Control.Monad.Trans.Control (MonadBaseControl)
 import Web.Skype.Core
-import Web.Skype.Entity
 import Web.Skype.Protocol
 
 import qualified Web.Skype.Command.Chat as Chat
