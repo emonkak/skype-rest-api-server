@@ -4,14 +4,14 @@
 module Main where
 
 import App.Database
+import App.Fetcher
 import App.Router
 import Control.Concurrent.Lifted (fork)
-import Control.Concurrent.STM.TChan (readTChan)
-import Control.Monad (forever)
-import Control.Monad.STM (atomically)
 import Control.Monad.Trans (liftIO)
 import Web.Scotty (scotty)
+import Web.Skype.Protocol
 
+import qualified Data.ByteString.Lazy.Char8 as BSC
 import qualified Web.Skype.API as Skype
 import qualified Web.Skype.Command.Misc as Skype
 import qualified Web.Skype.Core as Skype
@@ -27,8 +27,12 @@ main = do
     Skype.protocol 9999
 
     fork $ Skype.onNotification $ \notification -> do
-      case Skype.parseNotification notification of
+      liftIO $ BSC.putStrLn notification
 
-      liftIO $ print $ Skype.parseNotification notification
+      case Skype.parseNotification notification of
+        Right (ChatMessage chatMessageID (ChatMessageStatus _)) -> do
+          -- Received a message.
+          fetchChatMessage chatMessageID >>= liftIO . withDatabase . storeChatMessage
+        _ -> return ()
 
   scotty 3000 $ router connection
