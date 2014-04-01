@@ -15,8 +15,8 @@ import Database.SQLite.Simple (FromRow(..), SQLData(..), field)
 import Database.SQLite.Simple.FromField (FromField(..), ResultError(..), returnError, fieldData)
 import Database.SQLite.Simple.Ok (Ok(..))
 import Database.SQLite.Simple.ToField (ToField(..))
-import Web.Skype.Core
-import Web.Skype.Protocol
+import Network.Skype.Core
+import Network.Skype.Protocol
 
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T

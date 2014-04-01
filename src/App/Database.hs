@@ -18,7 +18,7 @@ import Data.Maybe (listToMaybe)
 import Data.Monoid
 import System.Directory (getHomeDirectory)
 import System.FilePath ((</>))
-import Web.Skype.Protocol
+import Network.Skype.Protocol
 
 import qualified Data.Text as T
 import qualified Database.SQLite.Simple as SQLite

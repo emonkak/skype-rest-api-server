@@ -9,13 +9,13 @@ import App.Router
 import Control.Concurrent.Lifted (fork)
 import Control.Monad.Trans (liftIO)
 import Web.Scotty (scotty)
-import Web.Skype.Protocol
+import Network.Skype.Protocol
 
 import qualified Data.ByteString.Lazy.Char8 as BSC
-import qualified Web.Skype.API as Skype
-import qualified Web.Skype.Command.Misc as Skype
-import qualified Web.Skype.Core as Skype
-import qualified Web.Skype.Parser as Skype
+import qualified Network.Skype.API as Skype
+import qualified Network.Skype.Command.Misc as Skype
+import qualified Network.Skype.Core as Skype
+import qualified Network.Skype.Parser as Skype
 
 main :: IO ()
 main = do

@@ -3,7 +3,7 @@ module App.Router where
 import App.Controller
 import Web.Scotty
 
-import qualified Web.Skype.API as Skype
+import qualified Network.Skype.API as Skype
 
 router :: Skype.Connection -> ScottyM ()
 router connection = do

@@ -14,11 +14,11 @@ import App.Database
 import App.Fetcher
 import Control.Monad.Trans (MonadIO, liftIO)
 import Web.Scotty
-import Web.Skype.Core
+import Network.Skype.Core
 
-import qualified Web.Skype.API as Skype
-import qualified Web.Skype.Command.Chat as Chat
-import qualified Web.Skype.Command.User as User
+import qualified Network.Skype.API as Skype
+import qualified Network.Skype.Command.Chat as Chat
+import qualified Network.Skype.Command.User as User
 
 defaultPerPage :: Int
 defaultPerPage = 30

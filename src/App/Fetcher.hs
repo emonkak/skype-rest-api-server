@@ -6,12 +6,12 @@ import App.Entity
 import Control.Applicative
 import Control.Monad.Trans (MonadIO)
 import Control.Monad.Trans.Control (MonadBaseControl)
-import Web.Skype.Core
-import Web.Skype.Protocol
+import Network.Skype.Core
+import Network.Skype.Protocol
 
-import qualified Web.Skype.Command.Chat as Chat
-import qualified Web.Skype.Command.ChatMessage as ChatMessage
-import qualified Web.Skype.Command.User as User
+import qualified Network.Skype.Command.Chat as Chat
+import qualified Network.Skype.Command.ChatMessage as ChatMessage
+import qualified Network.Skype.Command.User as User
 
 fetchChat :: (MonadBaseControl IO m, MonadIO m, MonadSkype m)
           => ChatID
