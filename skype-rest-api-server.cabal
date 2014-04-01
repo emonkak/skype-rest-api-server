@@ -23,13 +23,15 @@ executable skype-rest-api-server
                        bytestring >=0.10.2,
                        directory >=1.0,
                        lifted-base >=0.2,
+                       filepath >=1.0,
                        monad-control >=0.3,
                        mtl >=2.0,
+                       process >=1.2,
                        scotty >=0.6,
                        skype4hs,
-                       filepath >=1.0,
                        sqlite-simple >=0.4.5,
-                       text >=0.11
+                       text >=0.11,
+                       warp >=2.1
   hs-source-dirs:      src
   default-language:    Haskell2010
   default-extensions:  OverloadedStrings
