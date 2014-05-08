@@ -106,7 +106,7 @@ instance ToJSON ChatMessageEntity where
   toJSON chatMessage = object
     [ "chat_message_id"     .= _chatMessageID chatMessage
     , "timestamp"           .= _chatMessageTimestamp chatMessage
-    , "sender"              .= _chatMessageSender chatMessage
+    , "sender"              .= (UserIDWrapper $ _chatMessageSender chatMessage)
     , "sender_display_name" .= _chatMessageSenderDisplayName chatMessage
     , "type"                .= _chatMessageType chatMessage
     , "status"              .= _chatMessageStatus chatMessage

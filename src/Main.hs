@@ -17,30 +17,31 @@ import Control.Monad.Error.Class (Error, MonadError, strMsg, throwError)
 import Control.Monad.Trans (MonadIO, liftIO)
 import Control.Monad.Trans.Control (MonadBaseControl)
 import Network.Skype.Protocol
-import Network.Wai.Handler.Warp
 import System.Console.GetOpt
+import System.Directory (canonicalizePath)
 import System.Environment (getArgs)
-import System.Process
+import System.Process (readProcess)
 
-import qualified Data.ByteString.Lazy.Char8 as BSLC
 import qualified Data.ByteString.Char8 as BSC
+import qualified Data.ByteString.Lazy.Char8 as BSLC
 import qualified Data.Text as T
 import qualified Network.Skype.API as Skype
 import qualified Network.Skype.Command.Chat as Chat
 import qualified Network.Skype.Command.Misc as Skype
 import qualified Network.Skype.Core as Skype
 import qualified Network.Skype.Parser as Skype
+import qualified Network.Wai.Handler.Warp as Warp
 import qualified Web.Scotty as Scotty
 
 data AppOptions = AppOptions
   { appOptionCallback :: Maybe FilePath
-  , appOptionServer :: Settings
+  , appOptionServer :: Warp.Settings
   }
 
 defaultOptions :: AppOptions
 defaultOptions = AppOptions
   { appOptionCallback = Nothing
-  , appOptionServer = defaultSettings
+  , appOptionServer = Warp.defaultSettings
   }
 
 optionSpec :: [OptDescr (AppOptions -> AppOptions)]
@@ -48,11 +49,11 @@ optionSpec =
   [ Option ['c'] ["callback"]
            (ReqArg (\param opts -> opts { appOptionCallback = Just param }) "FILE")
            "Notification callback script path"
-  , Option ['h'] ["host"]
-           (ReqArg (\param opts -> opts { appOptionServer = setHost (Host param) (appOptionServer opts) }) "HOST")
-           "Interface to bind to"
+  -- , Option ['h'] ["host"]
+  --          (ReqArg (\param opts -> opts { appOptionServer = Warp.setHost (Warp.Host param) (appOptionServer opts) }) "HOST")
+  --          "Interface to bind to"
   , Option ['p'] ["port"]
-           (ReqArg (\param opts -> opts { appOptionServer = setPort (read param) (appOptionServer opts) }) "PORT")
+           (ReqArg (\param opts -> opts { appOptionServer = Warp.setPort (read param) (appOptionServer opts) }) "PORT")
            "Port to listen on"
   ]
 
@@ -73,8 +74,9 @@ invokeCallbackScript chatMessage script = do
   let timestamp = _chatMessageTimestamp chatMessage
   let body = _chatMessageBody chatMessage
 
+  path <- liftIO $ canonicalizePath script
   topic <- Chat.getTopic chatID
-  output <- liftIO $ handle (\(_ :: IOException) -> return "") $ readProcess script
+  output <- liftIO $ handle (\(_ :: IOException) -> return "") $ readProcess path
                     [BSC.unpack chatID, T.unpack topic, BSC.unpack sender, show timestamp]
                     (T.unpack body)
 

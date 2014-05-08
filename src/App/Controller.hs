@@ -12,7 +12,7 @@ module App.Controller (
 
 import App.Database
 import App.Fetcher
-import Control.Monad.Trans (MonadIO, liftIO)
+import Control.Monad.Trans (liftIO)
 import Web.Scotty
 import Network.Skype.Core
 
