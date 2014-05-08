@@ -19,11 +19,11 @@ executable skype-rest-api-server
   main-is: Main.hs
   -- other-extensions:
   build-depends:       aeson >=0.6,
-                       base >=4.6 && <4.7,
+                       base >=4.6,
                        bytestring >=0.10.2,
                        directory >=1.0,
-                       lifted-base >=0.2,
                        filepath >=1.0,
+                       lifted-base >=0.2,
                        monad-control >=0.3,
                        mtl >=2.0,
                        process >=1.2,
