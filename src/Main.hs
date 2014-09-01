@@ -22,7 +22,8 @@ import System.Directory (canonicalizePath)
 import System.Environment (getArgs)
 import System.Process (readProcess)
 
-import qualified Data.ByteString.Char8 as BSC
+import qualified Data.HashMap.Strict as HM
+import qualified Data.Aeson as Aeson
 import qualified Data.ByteString.Lazy.Char8 as BSLC
 import qualified Data.Text as T
 import qualified Network.Skype.API as Skype
@@ -49,9 +50,6 @@ optionSpec =
   [ Option ['c'] ["callback"]
            (ReqArg (\param opts -> opts { appOptionCallback = Just param }) "FILE")
            "Notification callback script path"
-  -- , Option ['h'] ["host"]
-  --          (ReqArg (\param opts -> opts { appOptionServer = Warp.setHost (Warp.Host param) (appOptionServer opts) }) "HOST")
-  --          "Interface to bind to"
   , Option ['p'] ["port"]
            (ReqArg (\param opts -> opts { appOptionServer = Warp.setPort (read param) (appOptionServer opts) }) "PORT")
            "Port to listen on"
@@ -70,15 +68,15 @@ invokeCallbackScript :: (MonadIO m, MonadBaseControl IO m, Skype.MonadSkype m)
                      -> Skype.SkypeT m ()
 invokeCallbackScript chatMessage script = do
   let chatID = _chatMessageChat chatMessage
-  let sender = _chatMessageSender chatMessage
-  let timestamp = _chatMessageTimestamp chatMessage
-  let body = _chatMessageBody chatMessage
+  chat <- fetchChat $ chatID
+
+  let json = case Aeson.toJSON chatMessage of
+               Aeson.Object values -> Aeson.Object $ HM.insert "chat" (Aeson.toJSON chat) values
+               x                   -> x
 
   path <- liftIO $ canonicalizePath script
-  topic <- Chat.getTopic chatID
-  output <- liftIO $ handle (\(_ :: IOException) -> return "") $ readProcess path
-                    [BSC.unpack chatID, T.unpack topic, BSC.unpack sender, show timestamp]
-                    (T.unpack body)
+  output <- liftIO $ handle (\(_ :: IOException) -> return "") $
+                     readProcess path [] $ BSLC.unpack $ Aeson.encode json
 
   unless (null output) $ void $ Chat.sendMessage chatID $ T.pack output
 
