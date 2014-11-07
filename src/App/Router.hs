@@ -11,6 +11,6 @@ router connection = do
   get  "/chats/search"                  $ getSearchChatMessage
   get  "/users/"                        $ getAllUsers connection
   get  "/users/:user_id"                $ getUser connection
-  get  (regex "^/chats/(#.*)")          $ getChat connection
-  post (regex "^/chats/(#.*)")          $ postChat connection
-  get  (regex "^/chats/messages/(#.*)") $ getAllChatMessages connection
+  get  (regex "^/chats/messages/(.*)")  $ getAllChatMessages connection
+  get  (regex "^/chats/(.*)")           $ getChat connection
+  post (regex "^/chats/(.*)")           $ postChat connection
