@@ -168,19 +168,19 @@ instance FromField ChatMessageType where
     _                             -> returnError ConversionFailed f "need a text"
 
 instance ToString ChatMessageStatus where
-  toString ChatMessageStatusSending = "sending"
-  toString ChatMessageStatusSent    = "sent"
-  toString ChatMessageStatusReceive = "receive"
-  toString ChatMessageStatusRead    = "read"
+  toString ChatMessageStatusSending  = "sending"
+  toString ChatMessageStatusSent     = "sent"
+  toString ChatMessageStatusReceived = "received"
+  toString ChatMessageStatusRead     = "read"
 
 instance FromField ChatMessageStatus where
   fromField f = case fieldData f of
-    SQLText "sending" -> Ok ChatMessageStatusSending
-    SQLText "sent"    -> Ok ChatMessageStatusSent
-    SQLText "receive" -> Ok ChatMessageStatusReceive
-    SQLText "read"    -> Ok ChatMessageStatusRead
-    SQLText _         -> returnError ConversionFailed f "unexpected text"
-    _                 -> returnError ConversionFailed f "need a text"
+    SQLText "sending " -> Ok ChatMessageStatusSending
+    SQLText "sent"     -> Ok ChatMessageStatusSent
+    SQLText "received" -> Ok ChatMessageStatusReceived
+    SQLText "read"     -> Ok ChatMessageStatusRead
+    SQLText _          -> returnError ConversionFailed f "unexpected text"
+    _                  -> returnError ConversionFailed f "need a text"
 
 instance ToString ChatMessageLeaveReason where
   toString ChatMessageLeaveReasonUserNotFound          = "user_not_found"

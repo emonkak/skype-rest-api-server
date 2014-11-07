@@ -100,7 +100,7 @@ main = do
 
           liftIO $ withDatabase $ storeChatMessage chatMessage
 
-          when (status == ChatMessageStatusReceive) $
+          when (status == ChatMessageStatusReceived) $
             maybe (return ()) (invokeCallbackScript chatMessage) $ appOptionCallback options
         _ -> return ()
 

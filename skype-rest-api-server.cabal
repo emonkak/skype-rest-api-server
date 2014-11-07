@@ -28,7 +28,7 @@ executable skype-rest-api-server
                        mtl >=2.0,
                        process >=1.2,
                        scotty >=0.6,
-                       skype4hs,
+                       skype4hs >=0.1,
                        sqlite-simple >=0.4.5,
                        text >=0.11,
                        unordered-containers >=0.2,
